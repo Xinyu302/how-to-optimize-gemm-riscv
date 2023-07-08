@@ -1,0 +1,16 @@
+riscv64-unknown-linux-gnu-g++ -static -march=rv64gcv0p7xthead -Wall -O3  -std=c++11  -I.   -o test_matrix_multiply.o -c test_matrix_multiply.cpp 
+riscv64-unknown-linux-gnu-g++ -static -o unit_test test_matrix_multiply.o 
+qemu-riscv64 -cpu c906fdv unit_test
+40 2.973563e-01 0.000000e+00 
+80 3.006457e-01 0.000000e+00 
+120 2.654467e-01 0.000000e+00 
+160 2.956518e-01 0.000000e+00 
+200 2.949493e-01 0.000000e+00 
+240 2.949738e-01 0.000000e+00 
+280 2.946149e-01 0.000000e+00 
+320 2.951686e-01 0.000000e+00 
+360 2.952423e-01 0.000000e+00 
+400 2.947571e-01 0.000000e+00 
+440 2.938980e-01 0.000000e+00 
+480 2.926358e-01 0.000000e+00 
+
