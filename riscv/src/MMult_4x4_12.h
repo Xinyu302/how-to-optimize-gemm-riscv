@@ -119,7 +119,7 @@ void InnerKernel( int m, int n, int k, float *a, int lda,
   }
 }
 
-void MY_MMult_4x4_13( int m, int n, int k, float *a, int lda, 
+void MY_MMult_4x4_12( int m, int n, int k, float *a, int lda, 
                                     float *b, int ldb,
                                     float *c, int ldc ) 
 {
