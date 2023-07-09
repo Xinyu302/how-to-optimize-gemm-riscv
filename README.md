@@ -5,9 +5,9 @@
 ## RISC-V
 
 ### 实验设备
-D1 是全志科技首款基于 RISC-V 指令集的 SoC，主核是来自阿里平头哥的 64 位的 玄铁 C906。「哪吒」开发板 是全志在线基于全志科技 D1 芯片定制的 AIoT 开发板， 参考链接https://verimake.com/d/35-risc-v-soc-ai-d1-ncnn-demo完成哪吒开发板的配置。
+D1 是全志科技首款基于 RISC-V 指令集的 SoC，主核是来自阿里平头哥的 64 位的 玄铁 C906。「哪吒」开发板 是全志在线基于全志科技 D1 芯片定制的 AIoT 开发板， 参考[哪吒开发板固件烧写](https://verimake.com/d/35-risc-v-soc-ai-d1-ncnn-demo)完成哪吒开发板的配置。
 
-交叉编译环境的搭建参考NCNN文档(https://github.com/Tencent/ncnn/wiki/how-to-build#build-for-allwinner-d1)。使用平头哥官方提供的qemu对可执行文件进行模拟(https://xuantie.t-head.cn/community/download?id=4168444414324183040)。编译及运行方式可参考makefile。
+交叉编译环境的搭建参考[NCNN文档](https://github.com/Tencent/ncnn/wiki/how-to-build#build-for-allwinner-d1)。使用[平头哥官方提供的qemu](https://xuantie.t-head.cn/community/download?id=4168444414324183040)对可执行文件进行模拟。编译及运行方式可参考makefile。
 
 CPU: 全志D1-H C906 RISC-V 1GHz 
 
