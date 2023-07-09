@@ -21,6 +21,12 @@ def run(header):
         f.write(gen_main_from_template(header))
     os.system(f"make run > result_{header}.txt")
 
+def compile(header):
+    with open("test_matrix_multiply.cpp", "w", encoding="utf-8") as f:
+        f.write(gen_main_from_template(header))
+    os.system(f"make")
+    os.system(f"mkdir -p bin && mv unit_test bin/unit_test_{header}")
+
 def main(run_case=None):
     if run_case:
         run(run_case)
@@ -29,4 +35,8 @@ def main(run_case=None):
         run(header)
 
 if __name__ == '__main__':
-    main("MMult_4x4_10.h")
+    # main("MMult_4x4_10.h")
+    # main("MMult_4x4_11.h")
+    main("MMult_4x4_12.h")
+    # for ix, header in enumerate(header_file_list):
+    #     compile(header)
