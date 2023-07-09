@@ -7,9 +7,28 @@
 ### 实验设备
 D1 是全志科技首款基于 RISC-V 指令集的 SoC，主核是来自阿里平头哥的 64 位的 玄铁 C906。「哪吒」开发板 是全志在线基于全志科技 D1 芯片定制的 AIoT 开发板， 参考链接https://verimake.com/d/35-risc-v-soc-ai-d1-ncnn-demo完成哪吒开发板的配置。
 
+交叉编译环境的搭建参考NCNN文档(https://github.com/Tencent/ncnn/wiki/how-to-build#build-for-allwinner-d1)。使用平头哥官方提供的qemu对可执行文件进行模拟(https://xuantie.t-head.cn/community/download?id=4168444414324183040)。编译及运行方式可参考makefile。
+
 CPU: 全志D1-H C906 RISC-V 1GHz 
 
 OS: D1-H Tina Open v1.01
+
+### 测试方法
+将`run.py`中的main入口后的语句更改为:
+
+```python
+    for ix, header in enumerate(header_file_list):
+        compile(header)
+```
+
+将`run.py`中的main入口后的语句更改为:
+```python
+    main("MMult_4x4_13.h")
+    main("MMult_xxxxx.h")
+```
+使用qemu-riscv64进行对不同版本Gemm的测试。
+
+可在当前目录下新建bin目录，目录中即为可在C906 CPU上执行的文件。使用adb将bin目录拷贝到开发板中，加入执行权限即可运行。
 
 ### 实验结果
 M=N=K=400
