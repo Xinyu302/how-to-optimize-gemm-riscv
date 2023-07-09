@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <riscv_vector.h>
 
 /* Block sizes */
 #define mc 256
@@ -44,61 +45,57 @@ void PackMatrixA( int k, float *a, int lda, float * a_to)
   
 }
 
-#include <mmintrin.h>
-#include <xmmintrin.h>  // SSE
-#include <pmmintrin.h>  // SSE2
-#include <emmintrin.h>  // SSE3
-
-typedef union
-{
-  __m128 v;
-  float d[4];
-} v2df_t;
-
 void AddDot4x4( int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 {
-  v2df_t c_p0_sum;
-  v2df_t c_p1_sum;
-  v2df_t c_p2_sum;
-  v2df_t c_p3_sum;
-  v2df_t  a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg, b_reg;
+  size_t vlmax = vsetvlmax_e32m1();
 
-  c_p0_sum.v = _mm_setzero_ps();
-  c_p1_sum.v = _mm_setzero_ps();
-  c_p2_sum.v = _mm_setzero_ps();
-  c_p3_sum.v = _mm_setzero_ps();
-  a_0p_reg.v = _mm_setzero_ps();
-  a_1p_reg.v = _mm_setzero_ps();
-  a_2p_reg.v = _mm_setzero_ps();
-  a_3p_reg.v = _mm_setzero_ps();
+  vfloat32m1_t c_p0_sum = vfmv_v_f_f32m1(0.0f, vlmax);
+  vfloat32m1_t c_p1_sum = vfmv_v_f_f32m1(0.0f, vlmax);
+  vfloat32m1_t c_p2_sum = vfmv_v_f_f32m1(0.0f, vlmax);
+  vfloat32m1_t c_p3_sum = vfmv_v_f_f32m1(0.0f, vlmax);
 
+  register float
+  a_0p_reg,
+  a_1p_reg,   
+  a_2p_reg,
+  a_3p_reg;
   for (int p = 0; p < k; ++p) {
-    b_reg.v = _mm_load_ps(b);
+    vfloat32m1_t b_reg = vle32_v_f32m1(b, vlmax);
     b += 4;
 
-    a_0p_reg.v = _mm_set_ps1(a[0]);
-    a_1p_reg.v = _mm_set_ps1(a[1]);
-    a_2p_reg.v = _mm_set_ps1(a[2]);
-    a_3p_reg.v = _mm_set_ps1(a[3]);
+    a_0p_reg = a[0];
+    a_1p_reg = a[1];
+    a_2p_reg = a[2];
+    a_3p_reg = a[3];
     a += 4;
 
-    c_p0_sum.v += b_reg.v * a_0p_reg.v;
-    c_p1_sum.v += b_reg.v * a_1p_reg.v;
-    c_p2_sum.v += b_reg.v * a_2p_reg.v;
-    c_p3_sum.v += b_reg.v * a_3p_reg.v;
+    c_p0_sum = vfmacc_vf_f32m1(c_p0_sum, a_0p_reg, b_reg, vlmax);
+    c_p1_sum = vfmacc_vf_f32m1(c_p1_sum, a_1p_reg, b_reg, vlmax);
+    c_p2_sum = vfmacc_vf_f32m1(c_p2_sum, a_2p_reg, b_reg, vlmax);
+    c_p3_sum = vfmacc_vf_f32m1(c_p3_sum, a_3p_reg, b_reg, vlmax);
+    // 累加
   }
 
-  C(0, 0) += c_p0_sum.d[0]; C(0, 1) += c_p0_sum.d[1];
-  C(0, 2) += c_p0_sum.d[2]; C(0, 3) += c_p0_sum.d[3];
+  float *c_pntr = 0;
+  c_pntr = &C(0, 0);
+  vfloat32m1_t c_reg = vle32_v_f32m1(c_pntr, vlmax);
+  c_reg = vfadd_vv_f32m1(c_reg, c_p0_sum, vlmax);
+  vse32_v_f32m1(c_pntr, c_reg, vlmax);
 
-  C(1, 0) += c_p1_sum.d[0]; C(1, 1) += c_p1_sum.d[1];
-  C(1, 2) += c_p1_sum.d[2]; C(1, 3) += c_p1_sum.d[3];
+  c_pntr = &C(1, 0);
+  c_reg = vle32_v_f32m1(c_pntr, vlmax);
+  c_reg = vfadd_vv_f32m1(c_reg, c_p1_sum, vlmax);
+  vse32_v_f32m1(c_pntr, c_reg, vlmax);
 
-  C(2, 0) += c_p2_sum.d[0]; C(2, 1) += c_p2_sum.d[1];
-  C(2, 2) += c_p2_sum.d[2]; C(2, 3) += c_p2_sum.d[3];
+  c_pntr = &C(2, 0);
+  c_reg = vle32_v_f32m1(c_pntr, vlmax);
+  c_reg = vfadd_vv_f32m1(c_reg, c_p2_sum, vlmax);
+  vse32_v_f32m1(c_pntr, c_reg, vlmax);
 
-  C(3, 0) += c_p3_sum.d[0]; C(3, 1) += c_p3_sum.d[1];
-  C(3, 2) += c_p3_sum.d[2]; C(3, 3) += c_p3_sum.d[3];
+  c_pntr = &C(3, 0);
+  c_reg = vle32_v_f32m1(c_pntr, vlmax);
+  c_reg = vfadd_vv_f32m1(c_reg, c_p3_sum, vlmax);
+  vse32_v_f32m1(c_pntr, c_reg, vlmax);
 }
 
 void InnerKernel( int m, int n, int k, float *a, int lda, 
